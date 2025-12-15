@@ -13,10 +13,17 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Report Types -->
-    <div class="grid gap-6" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
-      <div class="card" @click="selectedReport = 'students'" style="cursor: pointer;">
+    <div
+      class="grid gap-6"
+      style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))"
+    >
+      <div
+        class="card"
+        @click="selectedReport = 'students'"
+        style="cursor: pointer"
+      >
         <div class="card-body">
           <div class="flex items-center gap-4">
             <div class="stat-icon primary">
@@ -29,8 +36,12 @@
           </div>
         </div>
       </div>
-      
-      <div class="card" @click="selectedReport = 'teachers'" style="cursor: pointer;">
+
+      <div
+        class="card"
+        @click="selectedReport = 'teachers'"
+        style="cursor: pointer"
+      >
         <div class="card-body">
           <div class="flex items-center gap-4">
             <div class="stat-icon secondary">
@@ -43,8 +54,12 @@
           </div>
         </div>
       </div>
-      
-      <div class="card" @click="selectedReport = 'grades'" style="cursor: pointer;">
+
+      <div
+        class="card"
+        @click="selectedReport = 'grades'"
+        style="cursor: pointer"
+      >
         <div class="card-body">
           <div class="flex items-center gap-4">
             <div class="stat-icon success">
@@ -57,8 +72,12 @@
           </div>
         </div>
       </div>
-      
-      <div class="card" @click="selectedReport = 'attendance'" style="cursor: pointer;">
+
+      <div
+        class="card"
+        @click="selectedReport = 'attendance'"
+        style="cursor: pointer"
+      >
         <div class="card-body">
           <div class="flex items-center gap-4">
             <div class="stat-icon warning">
@@ -72,7 +91,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Report Content -->
     <div v-if="selectedReport" class="card mt-6">
       <div class="card-header">
@@ -85,31 +104,42 @@
         <div v-if="loading" class="text-center p-6">
           <div class="spinner"></div>
         </div>
-        
+
         <!-- Student Report -->
         <div v-else-if="selectedReport === 'students' && stats">
           <div class="mb-6">
             <h4 class="font-semibold mb-3">ສະຫຼຸບຈຳນວນນັກຮຽນ</h4>
             <div class="grid grid-cols-4 gap-4">
-              <div class="p-4 rounded-lg" style="background: var(--primary-50);">
-                <div class="text-2xl font-bold text-primary-600">{{ stats.overview?.activeStudents || 0 }}</div>
+              <div class="p-4 rounded-lg" style="background: var(--primary-50)">
+                <div class="text-2xl font-bold text-primary-600">
+                  {{ stats.overview?.activeStudents || 0 }}
+                </div>
                 <div class="text-sm text-muted">ນັກຮຽນທັງໝົດ</div>
               </div>
-              <div class="p-4 rounded-lg" style="background: var(--secondary-50);">
-                <div class="text-2xl font-bold text-secondary-600">{{ stats.overview?.maleStudents || 0 }}</div>
+              <div
+                class="p-4 rounded-lg"
+                style="background: var(--secondary-50)"
+              >
+                <div class="text-2xl font-bold text-secondary-600">
+                  {{ stats.overview?.maleStudents || 0 }}
+                </div>
                 <div class="text-sm text-muted">ນັກຮຽນຊາຍ</div>
               </div>
-              <div class="p-4 rounded-lg" style="background: var(--success-50);">
-                <div class="text-2xl font-bold text-success-600">{{ stats.overview?.femaleStudents || 0 }}</div>
+              <div class="p-4 rounded-lg" style="background: var(--success-50)">
+                <div class="text-2xl font-bold text-success-600">
+                  {{ stats.overview?.femaleStudents || 0 }}
+                </div>
                 <div class="text-sm text-muted">ນັກຮຽນຍິງ</div>
               </div>
-              <div class="p-4 rounded-lg" style="background: var(--warning-50);">
-                <div class="text-2xl font-bold text-warning-600">{{ stats.overview?.totalClassrooms || 0 }}</div>
+              <div class="p-4 rounded-lg" style="background: var(--warning-50)">
+                <div class="text-2xl font-bold text-warning-600">
+                  {{ stats.overview?.totalClassrooms || 0 }}
+                </div>
                 <div class="text-sm text-muted">ຫ້ອງຮຽນ</div>
               </div>
             </div>
           </div>
-          
+
           <h4 class="font-semibold mb-3">ນັກຮຽນແຍກຕາມຫ້ອງ</h4>
           <table class="table">
             <thead>
@@ -125,65 +155,109 @@
                 <td>{{ room.roomName }}</td>
                 <td class="text-center">{{ room.maleCount }}</td>
                 <td class="text-center">{{ room.femaleCount }}</td>
-                <td class="text-center font-semibold">{{ room.totalStudents }}</td>
+                <td class="text-center font-semibold">
+                  {{ room.totalStudents }}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        
+
         <!-- Teacher Report -->
         <div v-else-if="selectedReport === 'teachers' && stats">
           <h4 class="font-semibold mb-3">ອາຈານແຍກຕາມພາກວິຊາ</h4>
-          <div class="grid gap-4" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-            <div 
-              v-for="dept in stats.teachersByDepartment" 
+          <div
+            class="grid gap-4"
+            style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"
+          >
+            <div
+              v-for="dept in stats.teachersByDepartment"
               :key="dept.department"
-              class="p-4 rounded-lg" 
-              style="background: var(--neutral-50);"
+              class="p-4 rounded-lg"
+              style="background: var(--neutral-50)"
             >
               <div class="text-2xl font-bold">{{ dept._count.id }}</div>
-              <div class="text-sm text-muted">{{ getDepartmentLabel(dept.department) }}</div>
+              <div class="text-sm text-muted">
+                {{ getDepartmentLabel(dept.department) }}
+              </div>
             </div>
           </div>
         </div>
-        
+
         <!-- Grades Report -->
         <div v-else-if="selectedReport === 'grades' && stats?.gradeStats">
           <h4 class="font-semibold mb-3">ສະຖິຕິຜົນການຮຽນ</h4>
           <div class="grid grid-cols-3 gap-4">
-            <div class="p-6 rounded-lg text-center" style="background: var(--success-50);">
-              <div class="text-4xl font-bold text-success-600">{{ stats.gradeStats.passed }}</div>
+            <div
+              class="p-6 rounded-lg text-center"
+              style="background: var(--success-50)"
+            >
+              <div class="text-4xl font-bold text-success-600">
+                {{ stats.gradeStats.passed }}
+              </div>
               <div class="text-muted">ນັກຮຽນເສັ່ງ</div>
             </div>
-            <div class="p-6 rounded-lg text-center" style="background: var(--error-50);">
-              <div class="text-4xl font-bold text-error-600">{{ stats.gradeStats.failed }}</div>
+            <div
+              class="p-6 rounded-lg text-center"
+              style="background: var(--error-50)"
+            >
+              <div class="text-4xl font-bold text-error-600">
+                {{ stats.gradeStats.failed }}
+              </div>
               <div class="text-muted">ນັກຮຽນຕົກ</div>
             </div>
-            <div class="p-6 rounded-lg text-center" style="background: var(--primary-50);">
-              <div class="text-4xl font-bold text-primary-600">{{ stats.gradeStats.passRate }}%</div>
+            <div
+              class="p-6 rounded-lg text-center"
+              style="background: var(--primary-50)"
+            >
+              <div class="text-4xl font-bold text-primary-600">
+                {{ stats.gradeStats.passRate }}%
+              </div>
               <div class="text-muted">ອັດຕາເສັ່ງ</div>
             </div>
           </div>
         </div>
-        
+
         <!-- Attendance Report -->
-        <div v-else-if="selectedReport === 'attendance' && stats?.attendanceStats">
+        <div
+          v-else-if="selectedReport === 'attendance' && stats?.attendanceStats"
+        >
           <h4 class="font-semibold mb-3">ສະຖິຕິການເຂົ້າຮຽນ (30 ມື້ຜ່ານມາ)</h4>
           <div class="grid grid-cols-4 gap-4">
-            <div class="p-4 rounded-lg text-center" style="background: var(--success-50);">
-              <div class="text-2xl font-bold text-success-600">{{ stats.attendanceStats.present }}</div>
+            <div
+              class="p-4 rounded-lg text-center"
+              style="background: var(--success-50)"
+            >
+              <div class="text-2xl font-bold text-success-600">
+                {{ stats.attendanceStats.present }}
+              </div>
               <div class="text-muted">ເຂົ້າ</div>
             </div>
-            <div class="p-4 rounded-lg text-center" style="background: var(--error-50);">
-              <div class="text-2xl font-bold text-error-600">{{ stats.attendanceStats.absent }}</div>
+            <div
+              class="p-4 rounded-lg text-center"
+              style="background: var(--error-50)"
+            >
+              <div class="text-2xl font-bold text-error-600">
+                {{ stats.attendanceStats.absent }}
+              </div>
               <div class="text-muted">ຂາດ</div>
             </div>
-            <div class="p-4 rounded-lg text-center" style="background: var(--warning-50);">
-              <div class="text-2xl font-bold text-warning-600">{{ stats.attendanceStats.late }}</div>
+            <div
+              class="p-4 rounded-lg text-center"
+              style="background: var(--warning-50)"
+            >
+              <div class="text-2xl font-bold text-warning-600">
+                {{ stats.attendanceStats.late }}
+              </div>
               <div class="text-muted">ສາຍ</div>
             </div>
-            <div class="p-4 rounded-lg text-center" style="background: var(--primary-50);">
-              <div class="text-2xl font-bold text-primary-600">{{ stats.attendanceStats.excused }}</div>
+            <div
+              class="p-4 rounded-lg text-center"
+              style="background: var(--primary-50)"
+            >
+              <div class="text-2xl font-bold text-primary-600">
+                {{ stats.attendanceStats.excused }}
+              </div>
               <div class="text-muted">ອະນຸຍາດ</div>
             </div>
           </div>
@@ -194,59 +268,59 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth'
-import { useDashboardStore } from '~/stores/dashboard'
+import { useAuthStore } from "~/stores/auth";
+import { useDashboardStore } from "~/stores/dashboard";
 
 definePageMeta({
-  middleware: 'auth',
-})
+  middleware: "auth",
+});
 
-const authStore = useAuthStore()
-const dashboardStore = useDashboardStore()
+const authStore = useAuthStore();
+const dashboardStore = useDashboardStore();
 
-const selectedReport = ref<string | null>(null)
-const loading = computed(() => dashboardStore.loading)
-const stats = computed(() => dashboardStore.stats)
+const selectedReport = ref<string | null>(null);
+const loading = computed(() => dashboardStore.loading);
+const stats = computed(() => dashboardStore.stats);
 
 const reportTitles: Record<string, string> = {
-  students: 'ລາຍງານນັກຮຽນ',
-  teachers: 'ລາຍງານອາຈານ',
-  grades: 'ລາຍງານຜົນການຮຽນ',
-  attendance: 'ລາຍງານການເຂົ້າຮຽນ',
-}
+  students: "ລາຍງານນັກຮຽນ",
+  teachers: "ລາຍງານອາຈານ",
+  grades: "ລາຍງານຜົນການຮຽນ",
+  attendance: "ລາຍງານການເຂົ້າຮຽນ",
+};
 
 const departmentLabels: Record<string, string> = {
-  MATH: 'ຄະນິດສາດ',
-  SCIENCE: 'ວິທະຍາສາດ',
-  LANGUAGE: 'ພາສາ',
-  SOCIAL: 'ສັງຄົມ',
-  ARTS: 'ສິລະປະ',
-  PHYSICAL: 'ພະລະສຶກສາ',
-  TECHNOLOGY: 'ເຕັກໂນໂລຊີ',
-  GENERAL: 'ທົ່ວໄປ',
-}
+  MATH: "ຄະນິດສາດ",
+  SCIENCE: "ວິທະຍາສາດ",
+  LANGUAGE: "ພາສາ",
+  SOCIAL: "ສັງຄົມ",
+  ARTS: "ສິລະປະ",
+  PHYSICAL: "ພະລະສຶກສາ",
+  TECHNOLOGY: "ເຕັກໂນໂລຊີ",
+  GENERAL: "ທົ່ວໄປ",
+};
 
 function getDepartmentLabel(dept: string) {
-  return departmentLabels[dept] || dept
+  return departmentLabels[dept] || dept;
 }
 
 function exportData() {
-  alert('ກຳລັງພັດທະນາຟັງຊັນນີ້...')
+  alert("ກຳລັງພັດທະນາຟັງຊັນນີ້...");
 }
 
 function printReport() {
-  window.print()
+  window.print();
 }
 
 onMounted(async () => {
-  await authStore.initialize()
+  await authStore.initialize();
   if (!authStore.isAuthenticated) {
-    navigateTo('/login')
-    return
+    navigateTo("/login");
+    return;
   }
-  
-  await dashboardStore.fetchStats()
-})
+
+  await dashboardStore.fetchStats();
+});
 </script>
 
 <style scoped>
