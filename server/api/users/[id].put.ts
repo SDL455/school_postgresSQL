@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles, hashPassword } from '~/server/utils/auth'
-import { validateBody, updateUserSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles, hashPassword } from '../../utils/auth'
+import { validateBody, updateUserSchema } from '../../utils/validation'
 
 // PUT /api/users/:id - Update a user
 export default defineEventHandler(async (event) => {

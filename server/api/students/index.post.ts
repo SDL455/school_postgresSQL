@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, createStudentSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, createStudentSchema } from '../../utils/validation'
 
 // POST /api/students - Create a new student
 export default defineEventHandler(async (event) => {

@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, updateTeacherSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, updateTeacherSchema } from '../../utils/validation'
 
 // PUT /api/teachers/:id - Update a teacher
 export default defineEventHandler(async (event) => {

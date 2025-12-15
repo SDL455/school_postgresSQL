@@ -1,5 +1,5 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireAuth, canManageStudents } from '~/server/utils/auth'
+import { prisma } from '../../utils/prisma'
+import { requireAuth, canManageStudents } from '../../utils/auth'
 
 // GET /api/students - List all students
 export default defineEventHandler(async (event) => {

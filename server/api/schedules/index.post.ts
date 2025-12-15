@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, createScheduleSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, createScheduleSchema } from '../../utils/validation'
 
 // POST /api/schedules - Create a new schedule
 export default defineEventHandler(async (event) => {

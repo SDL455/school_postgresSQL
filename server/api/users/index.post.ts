@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles, hashPassword } from '~/server/utils/auth'
-import { validateBody, createUserSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles, hashPassword } from '../../utils/auth'
+import { validateBody, createUserSchema } from '../../utils/validation'
 
 // POST /api/users - Create a new user
 export default defineEventHandler(async (event) => {

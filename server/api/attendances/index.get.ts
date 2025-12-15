@@ -1,5 +1,5 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireAuth } from '~/server/utils/auth'
+import { prisma } from '../../utils/prisma'
+import { requireAuth } from '../../utils/auth'
 
 // GET /api/attendances - List attendances with filters
 export default defineEventHandler(async (event) => {

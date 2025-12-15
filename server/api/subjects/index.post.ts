@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, createSubjectSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, createSubjectSchema } from '../../utils/validation'
 import { z } from 'zod'
 
 const createSubjectWithGradeLevelsSchema = createSubjectSchema.extend({

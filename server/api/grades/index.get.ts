@@ -1,5 +1,5 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireAuth, canEnterGrades } from '~/server/utils/auth'
+import { prisma } from '../../utils/prisma'
+import { requireAuth, canEnterGrades } from '../../utils/auth'
 
 // GET /api/grades - List grades with filters
 export default defineEventHandler(async (event) => {

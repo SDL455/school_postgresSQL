@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, createGradeSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, createGradeSchema } from '../../utils/validation'
 
 // POST /api/grades - Create or update a grade
 export default defineEventHandler(async (event) => {

@@ -1,10 +1,20 @@
-import { PrismaClient } from '../app/generated/prisma'
+import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 import bcrypt from 'bcryptjs'
+import 'dotenv/config'
 
-const prisma = new PrismaClient()
+const connectionString = process.env.DATABASE_URL
+if (!connectionString) {
+  throw new Error('DATABASE_URL environment variable is not set')
+}
+
+const pool = new Pool({ connectionString })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  console.log('🌱 ເລີ່ມສ້າງຂໍ້ມູນເລີ່ມຕົ້ນ...')
+  console.log('Starting to seed data...')
   
   // Create Admin user
   const adminPassword = await bcrypt.hash('admin123', 10)
@@ -19,7 +29,7 @@ async function main() {
       status: 'ACTIVE',
     }
   })
-  console.log('✅ ສ້າງ Admin:', admin.username)
+  console.log('Created Admin:', admin.username)
   
   // Create Manager user
   const managerPassword = await bcrypt.hash('manager123', 10)
@@ -34,7 +44,7 @@ async function main() {
       status: 'ACTIVE',
     }
   })
-  console.log('✅ ສ້າງ Manager:', manager.username)
+  console.log('Created Manager:', manager.username)
   
   // Create Registrar user
   const registrarPassword = await bcrypt.hash('registrar123', 10)
@@ -49,7 +59,7 @@ async function main() {
       status: 'ACTIVE',
     }
   })
-  console.log('✅ ສ້າງ Registrar:', registrar.username)
+  console.log('Created Registrar:', registrar.username)
   
   // Create Grade Levels
   const gradeLevelsData = [
@@ -69,7 +79,7 @@ async function main() {
       create: data,
     })
   }
-  console.log('✅ ສ້າງ Grade Levels:', gradeLevelsData.length, 'ຊັ້ນ')
+  console.log('Created Grade Levels:', gradeLevelsData.length, 'levels')
   
   // Create Academic Year
   const year = await prisma.academicYear.upsert({
@@ -82,7 +92,7 @@ async function main() {
       status: 'OPEN',
     }
   })
-  console.log('✅ ສ້າງ Academic Year:', year.yearName)
+  console.log('Created Academic Year:', year.yearName)
   
   // Create Terms
   const term1 = await prisma.term.upsert({
@@ -110,7 +120,7 @@ async function main() {
       status: 'CLOSED',
     }
   })
-  console.log('✅ ສ້າງ Terms: 2 ພາກ')
+  console.log('Created Terms: 2 terms')
   
   // Create Subjects
   const subjectsData = [
@@ -138,7 +148,7 @@ async function main() {
       },
     })
   }
-  console.log('✅ ສ້າງ Subjects:', subjectsData.length, 'ວິຊາ')
+  console.log('Created Subjects:', subjectsData.length, 'subjects')
   
   // Create sample Teachers
   const teachersData = [
@@ -160,7 +170,7 @@ async function main() {
       },
     })
   }
-  console.log('✅ ສ້າງ Teachers:', teachersData.length, 'ຄົນ')
+  console.log('Created Teachers:', teachersData.length, 'teachers')
   
   // Create sample Classrooms
   const gradeLevels = await prisma.gradeLevel.findMany()
@@ -190,7 +200,7 @@ async function main() {
       classroomCount++
     }
   }
-  console.log('✅ ສ້າງ Classrooms:', classroomCount, 'ຫ້ອງ')
+  console.log('Created Classrooms:', classroomCount, 'classrooms')
   
   // Create sample Students
   const classrooms = await prisma.classroom.findMany()
@@ -223,10 +233,10 @@ async function main() {
       studentCount++
     }
   }
-  console.log('✅ ສ້າງ Students:', studentCount, 'ຄົນ')
+  console.log('Created Students:', studentCount, 'students')
   
-  console.log('\n🎉 ສ້າງຂໍ້ມູນເລີ່ມຕົ້ນສຳເລັດ!')
-  console.log('\n📌 ຂໍ້ມູນ Login:')
+  console.log('\nData seeding completed!')
+  console.log('\nLogin credentials:')
   console.log('   Admin: admin / admin123')
   console.log('   Manager: manager / manager123')
   console.log('   Registrar: registrar / registrar123')

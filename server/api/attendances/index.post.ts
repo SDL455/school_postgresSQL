@@ -1,5 +1,5 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
 import { z } from 'zod'
 
 const bulkAttendanceSchema = z.object({

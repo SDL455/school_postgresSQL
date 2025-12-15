@@ -1,5 +1,5 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
 
 // DELETE /api/students/:id - Delete a student
 export default defineEventHandler(async (event) => {

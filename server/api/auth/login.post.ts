@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { comparePassword, generateToken } from '~/server/utils/auth'
-import { validateBody, loginSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { comparePassword, generateToken } from '../../utils/auth'
+import { validateBody, loginSchema } from '../../utils/validation'
 
 export default defineEventHandler(async (event) => {
   const body = await validateBody(event, loginSchema)

@@ -1,6 +1,6 @@
-import { prisma } from '~/server/utils/prisma'
-import { requireRoles } from '~/server/utils/auth'
-import { validateBody, createAcademicYearSchema } from '~/server/utils/validation'
+import { prisma } from '../../utils/prisma'
+import { requireRoles } from '../../utils/auth'
+import { validateBody, createAcademicYearSchema } from '../../utils/validation'
 
 // POST /api/academic-years - Create a new academic year
 export default defineEventHandler(async (event) => {
