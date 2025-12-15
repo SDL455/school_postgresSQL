@@ -1,0 +1,457 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ================================
+// User & Authentication Models
+// ================================
+
+model User {
+  id       Int        @id @default(autoincrement())
+  username String     @unique @db.VarChar(50)
+  email    String     @unique @db.VarChar(100)
+  password String     @db.VarChar(255)
+  role     UserRole   @default(TEACHER)
+  status   UserStatus @default(ACTIVE)
+
+  // Relations
+  teacher Teacher?
+
+  // Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN // ຜູ້ອຳນວຍການ / Super Admin
+  MANAGER // ຜູ້ບໍລິຫານ (ຝ່າຍວິຊາການ/ວາງແຜນ)
+  REGISTRAR // ບັນຊີລົງທະບຽນ
+  TEACHER // ອາຈານ
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// ================================
+// Academic Year & Term Models
+// ================================
+
+model AcademicYear {
+  id        Int            @id @default(autoincrement())
+  yearName  String         @db.VarChar(20) // e.g., "2024-2025"
+  startDate DateTime
+  endDate   DateTime
+  status    AcademicStatus @default(OPEN)
+
+  // Relations
+  terms      Term[]
+  classrooms Classroom[]
+  grades     Grade[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("academic_years")
+}
+
+model Term {
+  id         Int            @id @default(autoincrement())
+  termName   String         @db.VarChar(50) // e.g., "ພາກ 1", "ພາກ 2"
+  termNumber Int // 1, 2
+  startDate  DateTime
+  endDate    DateTime
+  status     AcademicStatus @default(OPEN)
+
+  // Relations
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  grades         Grade[]
+  attendances    Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("terms")
+}
+
+enum AcademicStatus {
+  OPEN
+  CLOSED
+}
+
+// ================================
+// Teacher Model
+// ================================
+
+model Teacher {
+  id          Int       @id @default(autoincrement())
+  teacherCode String    @unique @db.VarChar(20)
+  firstName   String    @db.VarChar(100)
+  lastName    String    @db.VarChar(100)
+  gender      Gender
+  dateOfBirth DateTime?
+  phone       String?   @db.VarChar(20)
+  email       String?   @db.VarChar(100)
+  address     String?   @db.Text
+
+  mainSubject String?       @db.VarChar(100) // ວິຊາເອກ
+  department  Department    @default(GENERAL)
+  status      TeacherStatus @default(FULLTIME)
+
+  // User relation (optional - for teachers who have login)
+  userId Int?  @unique
+  user   User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Relations
+  homeroomClassrooms  Classroom[]          @relation("HomeroomTeacher")
+  teachingAssignments TeachingAssignment[]
+  schedules           Schedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("teachers")
+}
+
+enum Gender {
+  MALE // ຊາຍ
+  FEMALE // ຍິງ
+}
+
+enum Department {
+  MATH // ຄະນິດສາດ
+  SCIENCE // ວິທະຍາສາດ
+  LANGUAGE // ພາສາ
+  SOCIAL // ສັງຄົມ
+  ARTS // ສິລະປະ
+  PHYSICAL // ພະລະສຶກສາ
+  TECHNOLOGY // ເຕັກໂນໂລຊີ
+  GENERAL // ທົ່ວໄປ
+}
+
+enum TeacherStatus {
+  FULLTIME // ປະຈຳ
+  PARTTIME // ພາກສ່ວນ
+  RESIGNED // ອອກແລ້ວ
+}
+
+// ================================
+// GradeLevel Model (ຊັ້ນຮຽນ: ມ.1, ມ.2, ...)
+// ================================
+
+model GradeLevel {
+  id          Int     @id @default(autoincrement())
+  levelCode   String  @unique @db.VarChar(10) // e.g., "M1", "M2"
+  levelName   String  @db.VarChar(50) // e.g., "ມ.1", "ມ.2"
+  levelOrder  Int // For sorting: 1, 2, 3...
+  description String? @db.VarChar(255)
+
+  // Relations
+  classrooms         Classroom[]
+  subjectGradeLevels SubjectGradeLevel[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("grade_levels")
+}
+
+// ================================
+// Classroom Model (ຫ້ອງຮຽນ)
+// ================================
+
+model Classroom {
+  id       Int    @id @default(autoincrement())
+  roomCode String @unique @db.VarChar(20) // e.g., "M4-1"
+  roomName String @db.VarChar(50) // e.g., "ມ.4/1"
+  section  Int // ໝາຍເລກຫ້ອງ: 1, 2, ...
+  capacity Int? // ຈຳນວນນັກຮຽນສູງສຸດ
+
+  // Relations
+  gradeLevelId Int
+  gradeLevel   GradeLevel @relation(fields: [gradeLevelId], references: [id], onDelete: Restrict)
+
+  academicYearId Int
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Restrict)
+
+  homeroomTeacherId Int?
+  homeroomTeacher   Teacher? @relation("HomeroomTeacher", fields: [homeroomTeacherId], references: [id], onDelete: SetNull)
+
+  students            Student[]
+  teachingAssignments TeachingAssignment[]
+  schedules           Schedule[]
+  attendances         Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([gradeLevelId, section, academicYearId])
+  @@map("classrooms")
+}
+
+// ================================
+// Student Model (ນັກຮຽນ)
+// ================================
+
+model Student {
+  id           Int       @id @default(autoincrement())
+  studentCode  String    @unique @db.VarChar(20)
+  firstName    String    @db.VarChar(100)
+  lastName     String    @db.VarChar(100)
+  gender       Gender
+  dateOfBirth  DateTime?
+  placeOfBirth String?   @db.VarChar(255)
+  address      String?   @db.Text
+  phone        String?   @db.VarChar(20)
+  email        String?   @db.VarChar(100)
+
+  // Guardian info
+  guardianName     String? @db.VarChar(200)
+  guardianPhone    String? @db.VarChar(20)
+  guardianRelation String? @db.VarChar(50)
+
+  // Current classroom
+  classroomId Int?
+  classroom   Classroom? @relation(fields: [classroomId], references: [id], onDelete: SetNull)
+
+  status         StudentStatus @default(STUDYING)
+  enrollmentDate DateTime      @default(now())
+
+  // Relations
+  grades      Grade[]
+  attendances Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("students")
+}
+
+enum StudentStatus {
+  STUDYING // ກຳລັງຮຽນ
+  GRADUATED // ຈົບ
+  TRANSFERRED // ຍ້າຍອອກ
+  SUSPENDED // ພັກຮຽນ
+  DROPPED // ອອກກາງຄັນ
+}
+
+// ================================
+// Subject Model (ວິຊາ)
+// ================================
+
+model Subject {
+  id           Int           @id @default(autoincrement())
+  subjectCode  String        @unique @db.VarChar(20)
+  subjectName  String        @db.VarChar(100)
+  description  String?       @db.Text
+  credits      Float? // ໜ່ວຍກິດ
+  hoursPerWeek Int? // ຊົ່ວໂມງຕໍ່ອາທິດ
+  department   Department    @default(GENERAL)
+  status       SubjectStatus @default(ACTIVE)
+
+  // Relations
+  subjectGradeLevels  SubjectGradeLevel[]
+  teachingAssignments TeachingAssignment[]
+  schedules           Schedule[]
+  grades              Grade[]
+  attendances         Attendance[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("subjects")
+}
+
+enum SubjectStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// Subject-GradeLevel (ວິຊາໃດສອນຊັ້ນໃດ)
+model SubjectGradeLevel {
+  id           Int @id @default(autoincrement())
+  subjectId    Int
+  gradeLevelId Int
+
+  subject    Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  gradeLevel GradeLevel @relation(fields: [gradeLevelId], references: [id], onDelete: Cascade)
+
+  @@unique([subjectId, gradeLevelId])
+  @@map("subject_grade_levels")
+}
+
+// ================================
+// Teaching Assignment (ອາຈານ-ຫ້ອງ-ວິຊາ)
+// ================================
+
+model TeachingAssignment {
+  id          Int @id @default(autoincrement())
+  teacherId   Int
+  classroomId Int
+  subjectId   Int
+
+  teacher   Teacher   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([teacherId, classroomId, subjectId])
+  @@map("teaching_assignments")
+}
+
+// ================================
+// Schedule Model (ຕາຕະລາງຮຽນ)
+// ================================
+
+model Schedule {
+  id          Int @id @default(autoincrement())
+  classroomId Int
+  subjectId   Int
+  teacherId   Int
+
+  dayOfWeek    DayOfWeek
+  periodNumber Int // ຄາບທີ 1, 2, 3...
+  startTime    String    @db.VarChar(10) // "08:00"
+  endTime      String    @db.VarChar(10) // "09:00"
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  subject   Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  teacher   Teacher   @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([classroomId, dayOfWeek, periodNumber])
+  @@map("schedules")
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+// ================================
+// Grade/Score Model (ຄະແນນ)
+// ================================
+
+model Grade {
+  id             Int @id @default(autoincrement())
+  studentId      Int
+  subjectId      Int
+  termId         Int
+  academicYearId Int
+
+  // Scores
+  midtermScore    Float? // ຄະແນນກາງພາກ
+  finalScore      Float? // ຄະແນນປາຍພາກ
+  homeworkScore   Float? // ຄະແນນວຽກບ້ານ
+  quizScore       Float? // ຄະແນນສອບເສັງຍ່ອຍ
+  attendanceScore Float? // ຄະແນນເຂົ້າຮຽນ
+  totalScore      Float? // ຄະແນນລວມ
+
+  resultStatus ResultStatus? // ເສັ່ງ/ຕົກ
+
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subject      Subject      @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  term         Term         @relation(fields: [termId], references: [id], onDelete: Cascade)
+  academicYear AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, subjectId, termId, academicYearId])
+  @@map("grades")
+}
+
+enum ResultStatus {
+  PASS // ເສັ່ງ
+  FAIL // ຕົກ
+}
+
+// ================================
+// Attendance Model (ການຂາດຮຽນ)
+// ================================
+
+model Attendance {
+  id          Int  @id @default(autoincrement())
+  studentId   Int
+  classroomId Int
+  subjectId   Int?
+  termId      Int
+
+  date         DateTime         @db.Date
+  periodNumber Int? // ຄາບທີ
+  status       AttendanceStatus
+  note         String?          @db.Text
+
+  student   Student   @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  subject   Subject?  @relation(fields: [subjectId], references: [id], onDelete: SetNull)
+  term      Term      @relation(fields: [termId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, date, periodNumber])
+  @@map("attendances")
+}
+
+enum AttendanceStatus {
+  PRESENT // ເຂົ້າ
+  ABSENT // ຂາດ
+  LATE // ສາຍ
+  EXCUSED // ມີໃບອະນຸຍາດ
+}
+
+// ================================
+// System Settings
+// ================================
+
+model SystemSetting {
+  id          Int     @id @default(autoincrement())
+  key         String  @unique @db.VarChar(100)
+  value       String  @db.Text
+  description String? @db.VarChar(255)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+// ================================
+// Audit Log (ປະຫວັດການແກ້ໄຂ)
+// ================================
+
+model AuditLog {
+  id        Int     @id @default(autoincrement())
+  userId    Int?
+  action    String  @db.VarChar(50) // CREATE, UPDATE, DELETE
+  tableName String  @db.VarChar(100)
+  recordId  Int
+  oldData   Json?
+  newData   Json?
+  ipAddress String? @db.VarChar(50)
+  userAgent String? @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@map("audit_logs")
+}
