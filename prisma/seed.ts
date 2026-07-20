@@ -16,7 +16,7 @@ const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('Starting to seed data...')
-  
+
   // Create Admin user
   const adminPassword = await bcrypt.hash('admin123', 10)
   const admin = await prisma.user.upsert({
@@ -31,7 +31,7 @@ async function main() {
     }
   })
   console.log('Created Admin:', admin.username)
-  
+
   // Create Manager user
   const managerPassword = await bcrypt.hash('manager123', 10)
   const manager = await prisma.user.upsert({
@@ -46,7 +46,7 @@ async function main() {
     }
   })
   console.log('Created Manager:', manager.username)
-  
+
   // Create Registrar user
   const registrarPassword = await bcrypt.hash('registrar123', 10)
   const registrar = await prisma.user.upsert({
@@ -61,7 +61,7 @@ async function main() {
     }
   })
   console.log('Created Registrar:', registrar.username)
-  
+
   // Create Grade Levels
   const gradeLevelsData = [
     { levelCode: 'M1', levelName: 'ມ.1', levelOrder: 1, description: 'ມັດທະຍົມສຶກສາປີທີ 1' },
@@ -72,7 +72,7 @@ async function main() {
     { levelCode: 'M6', levelName: 'ມ.6', levelOrder: 6, description: 'ມັດທະຍົມສຶກສາປີທີ 6' },
     { levelCode: 'M7', levelName: 'ມ.7', levelOrder: 7, description: 'ມັດທະຍົມສຶກສາປີທີ 7' },
   ]
-  
+
   for (const data of gradeLevelsData) {
     await prisma.gradeLevel.upsert({
       where: { levelCode: data.levelCode },
@@ -81,7 +81,7 @@ async function main() {
     })
   }
   console.log('Created Grade Levels:', gradeLevelsData.length, 'levels')
-  
+
   // Create Academic Year
   const year = await prisma.academicYear.upsert({
     where: { id: 1 },
@@ -94,7 +94,7 @@ async function main() {
     }
   })
   console.log('Created Academic Year:', year.yearName)
-  
+
   // Create Terms
   const term1 = await prisma.term.upsert({
     where: { id: 1 },
@@ -108,7 +108,7 @@ async function main() {
       status: 'OPEN',
     }
   })
-  
+
   await prisma.term.upsert({
     where: { id: 2 },
     update: {},
@@ -122,7 +122,7 @@ async function main() {
     }
   })
   console.log('Created Terms: 2 terms')
-  
+
   // Create Subjects
   const subjectsData = [
     { subjectCode: 'MATH', subjectName: 'ຄະນິດສາດ', department: 'MATH' as const, hoursPerWeek: 5, credits: 3 },
@@ -138,7 +138,7 @@ async function main() {
     { subjectCode: 'ART', subjectName: 'ສິລະປະ', department: 'ARTS' as const, hoursPerWeek: 2, credits: 1 },
     { subjectCode: 'ICT', subjectName: 'ເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ', department: 'TECHNOLOGY' as const, hoursPerWeek: 2, credits: 1 },
   ]
-  
+
   for (const data of subjectsData) {
     await prisma.subject.upsert({
       where: { subjectCode: data.subjectCode },
@@ -150,7 +150,7 @@ async function main() {
     })
   }
   console.log('Created Subjects:', subjectsData.length, 'subjects')
-  
+
   // Create sample Teachers
   const teachersData = [
     { teacherCode: 'T001', firstName: 'ສົມພອນ', lastName: 'ແກ້ວມະນີ', gender: 'MALE' as const, department: 'MATH' as const, mainSubject: 'ຄະນິດສາດ' },
@@ -159,7 +159,7 @@ async function main() {
     { teacherCode: 'T004', firstName: 'ສີສະຫວາດ', lastName: 'ພົມມະຈັນ', gender: 'MALE' as const, department: 'LANGUAGE' as const, mainSubject: 'ພາສາອັງກິດ' },
     { teacherCode: 'T005', firstName: 'ນາງ ອຳພອນ', lastName: 'ສຸກສະຫວັນ', gender: 'FEMALE' as const, department: 'SOCIAL' as const, mainSubject: 'ປະຫວັດສາດ' },
   ]
-  
+
   for (const data of teachersData) {
     await prisma.teacher.upsert({
       where: { teacherCode: data.teacherCode },
@@ -172,19 +172,19 @@ async function main() {
     })
   }
   console.log('Created Teachers:', teachersData.length, 'teachers')
-  
+
   // Create sample Classrooms
   const gradeLevels = await prisma.gradeLevel.findMany()
   const teachers = await prisma.teacher.findMany()
-  
+
   let classroomCount = 0
   for (const level of gradeLevels.slice(0, 4)) { // Create for M1-M4
     for (let section = 1; section <= 2; section++) {
       const roomCode = `${level.levelCode}-${section}`
       const roomName = `${level.levelName}/${section}`
-      
+
       const teacher = teachers[classroomCount % teachers.length]
-      
+
       await prisma.classroom.upsert({
         where: { roomCode },
         update: {},
@@ -202,12 +202,12 @@ async function main() {
     }
   }
   console.log('Created Classrooms:', classroomCount, 'classrooms')
-  
+
   // Create sample Students
   const classrooms = await prisma.classroom.findMany()
   const firstNames = ['ສົມໃຈ', 'ບຸນເລີດ', 'ວິໄລ', 'ສຸວັນນາ', 'ພອນໄຊ', 'ດາວ', 'ແສງຈັນ', 'ມາລີ', 'ສຸກໃສ', 'ອຳພອນ']
   const lastNames = ['ແກ້ວມະນີ', 'ສີລິພັນ', 'ວົງວິໄລ', 'ພົມມະຈັນ', 'ສຸກສະຫວັນ', 'ໄຊຍະວົງ', 'ບຸນຍະວົງ', 'ອິນທະວົງ']
-  
+
   let studentCount = 0
   for (const classroom of classrooms) {
     for (let i = 0; i < 10; i++) { // 10 students per class
@@ -215,7 +215,7 @@ async function main() {
       const firstName = firstNames[Math.floor(Math.random() * firstNames.length)]
       const lastName = lastNames[Math.floor(Math.random() * lastNames.length)]
       const gender = Math.random() > 0.5 ? 'MALE' : 'FEMALE'
-      
+
       await prisma.student.upsert({
         where: { studentCode },
         update: {},
@@ -235,7 +235,7 @@ async function main() {
     }
   }
   console.log('Created Students:', studentCount, 'students')
-  
+
   console.log('\nData seeding completed!')
   console.log('\nLogin credentials:')
   console.log('   Admin: admin / admin123')
